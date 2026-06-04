@@ -1,4 +1,3 @@
-```html
 <!DOCTYPE html>
 <html lang="en">
 <head>
@@ -268,63 +267,3 @@ async function getVehicleDetails(){
 </body>
 </html>
 ```
-    background:#eee;
-    padding:15px;
-    border-radius:5px;
-    overflow:auto;
-    white-space:pre-wrap;
-}
-</style>
-</head>
-<body>
-
-<div class="container">
-    <h2>Vehicle Details Checker</h2>
-
-    <input type="text" id="vehicleNo" placeholder="Enter Vehicle Number (e.g. RJ14CV0002)">
-    <button onclick="getVehicleDetails()">Check</button>
-
-    <h3>Result:</h3>
-    <pre id="result">No data fetched yet.</pre>
-</div>
-
-<script>
-async function getVehicleDetails() {
-
-    const vehicleNo = document.getElementById("vehicleNo").value.trim().toUpperCase();
-
-    if(!vehicleNo){
-        alert("Please enter a vehicle number");
-        return;
-    }
-
-    const url =
-    `https://app.turtlemintinsurance.com/api/findregistrationresult?registration=${vehicleNo}&vertical=FW`;
-
-    try {
-
-        document.getElementById("result").textContent = "Loading...";
-
-        const response = await fetch(url);
-
-        if(!response.ok){
-            throw new Error("Request failed");
-        }
-
-        const data = await response.json();
-
-        document.getElementById("result").textContent =
-            JSON.stringify(data, null, 2);
-
-    } catch(error){
-
-        document.getElementById("result").textContent =
-            "Error: " + error.message;
-
-        console.error(error);
-    }
-}
-</script>
-
-</body>
-</html>
