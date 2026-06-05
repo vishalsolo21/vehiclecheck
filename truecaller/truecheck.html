@@ -168,7 +168,9 @@ async function checkData() {
         const api =
         `https://ye-lo-mojkro.noob73613.workers.dev/?api_key=@noob11001&number=${number}`;
 
-        const response = await fetch(api);
+        const response = await fetch(
+  "https://corsproxy.io/?" + encodeURIComponent(api)
+);
         const data = await response.json();
 
         document.getElementById("loading").style.display = "none";
