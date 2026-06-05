@@ -153,16 +153,13 @@ async function checkData(){
     try{
 
         const response = await fetch(`/api/check?number=${number}`);
-const data = await response.json();
-        const rawText =
-            await response.text();
 
-        document.getElementById("loading").style.display =
-            "none";
+const text = await response.text();
 
-        result.innerHTML =
-            `<pre>${escapeHtml(rawText)}</pre>`;
+console.log(text);
 
+document.getElementById("result").innerHTML =
+    `<pre>${text}</pre>`;
     }
     catch(error){
 
