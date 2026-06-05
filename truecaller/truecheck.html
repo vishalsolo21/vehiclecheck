@@ -1,0 +1,218 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Truecaller Number Checker</title>
+
+<style>
+*{
+    margin:0;
+    padding:0;
+    box-sizing:border-box;
+    font-family:'Segoe UI',sans-serif;
+}
+
+body{
+    background:#f4f6f9;
+    min-height:100vh;
+    display:flex;
+    flex-direction:column;
+}
+
+.container{
+    max-width:500px;
+    margin:30px auto;
+    padding:20px;
+    width:100%;
+}
+
+.card{
+    background:#fff;
+    border-radius:16px;
+    padding:25px;
+    box-shadow:0 4px 15px rgba(0,0,0,.08);
+}
+
+h1{
+    text-align:center;
+    color:#1e293b;
+    margin-bottom:20px;
+    font-size:26px;
+}
+
+.input-group{
+    display:flex;
+    gap:10px;
+}
+
+input{
+    flex:1;
+    padding:14px;
+    border:1px solid #d1d5db;
+    border-radius:10px;
+    font-size:16px;
+    outline:none;
+}
+
+input:focus{
+    border-color:#2563eb;
+}
+
+button{
+    background:#2563eb;
+    color:white;
+    border:none;
+    padding:14px 20px;
+    border-radius:10px;
+    cursor:pointer;
+    font-weight:600;
+}
+
+button:hover{
+    background:#1d4ed8;
+}
+
+.loader{
+    display:none;
+    text-align:center;
+    margin-top:15px;
+    color:#2563eb;
+}
+
+.result{
+    margin-top:20px;
+    display:none;
+}
+
+table{
+    width:100%;
+    border-collapse:collapse;
+    overflow:hidden;
+    border-radius:10px;
+}
+
+th{
+    background:#2563eb;
+    color:white;
+    padding:12px;
+    text-align:left;
+}
+
+td{
+    padding:12px;
+    border-bottom:1px solid #e5e7eb;
+    word-break:break-word;
+}
+
+tr:nth-child(even){
+    background:#f8fafc;
+}
+
+.error{
+    margin-top:15px;
+    color:red;
+    text-align:center;
+}
+
+footer{
+    margin-top:auto;
+    text-align:center;
+    padding:20px;
+    color:#6b7280;
+    font-size:14px;
+}
+
+footer span{
+    color:#16a34a;
+    font-weight:600;
+}
+</style>
+</head>
+<body>
+
+<div class="container">
+    <div class="card">
+        <h1>Truecaller Checker</h1>
+
+        <div class="input-group">
+            <input type="tel" id="number" placeholder="Enter Mobile Number">
+            <button onclick="checkNumber()">Check</button>
+        </div>
+
+        <div class="loader" id="loader">
+            Fetching details...
+        </div>
+
+        <div class="error" id="error"></div>
+
+        <div class="result" id="result">
+            <table>
+                <thead>
+                    <tr>
+                        <th>Field</th>
+                        <th>Value</th>
+                    </tr>
+                </thead>
+                <tbody id="tableData"></tbody>
+            </table>
+        </div>
+    </div>
+</div>
+
+<footer>
+    Made with ❤️ by Vishal |
+    <span>RAIGANJLOOTERS</span>
+</footer>
+
+<script>
+async function checkNumber() {
+    const number = document.getElementById("number").value.trim();
+
+    if (!number) {
+        alert("Enter a mobile number");
+        return;
+    }
+
+    document.getElementById("loader").style.display = "block";
+    document.getElementById("result").style.display = "none";
+    document.getElementById("error").innerText = "";
+
+    try {
+        const response = await fetch(
+            `https://ansh-apis.is-dev.org/api/truecaller?key=ansh&num=${number}`
+        );
+
+        const data = await response.json();
+
+        document.getElementById("loader").style.display = "none";
+
+        const hiddenFields = ["status", "owner", "credit"];
+
+        const tableBody = document.getElementById("tableData");
+        tableBody.innerHTML = "";
+
+        for (const key in data) {
+            if (hiddenFields.includes(key)) continue;
+
+            const row = `
+                <tr>
+                    <td>${key}</td>
+                    <td>${data[key] ?? "N/A"}</td>
+                </tr>
+            `;
+            tableBody.innerHTML += row;
+        }
+
+        document.getElementById("result").style.display = "block";
+
+    } catch (err) {
+        document.getElementById("loader").style.display = "none";
+        document.getElementById("error").innerText =
+            "Failed to fetch data.";
+    }
+}
+</script>
+
+</body>
+</html>
