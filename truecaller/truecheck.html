@@ -3,7 +3,7 @@
 <head>
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
-<title>Truecaller Number Checker</title>
+<title>Mobile Number Details Checker</title>
 
 <style>
 *{
@@ -22,7 +22,7 @@ body{
 
 .container{
     width:100%;
-    max-width:550px;
+    max-width:600px;
     margin:30px auto;
     padding:15px;
 }
@@ -63,7 +63,7 @@ button{
     background:#2563eb;
     color:white;
     border:none;
-    padding:14px 18px;
+    padding:14px 20px;
     border-radius:10px;
     cursor:pointer;
     font-weight:600;
@@ -84,7 +84,7 @@ button:hover{
 
 .error{
     display:none;
-    margin-top:20px;
+    margin-top:15px;
     padding:12px;
     border-radius:10px;
     background:#fee2e2;
@@ -101,8 +101,8 @@ button:hover{
 table{
     width:100%;
     border-collapse:collapse;
-    overflow:hidden;
     border-radius:10px;
+    overflow:hidden;
 }
 
 th{
@@ -130,9 +130,19 @@ footer{
     font-size:14px;
 }
 
-footer .brand{
+.brand{
     color:#16a34a;
     font-weight:600;
+}
+
+@media(max-width:500px){
+    .input-group{
+        flex-direction:column;
+    }
+
+    button{
+        width:100%;
+    }
 }
 </style>
 </head>
@@ -141,7 +151,7 @@ footer .brand{
 <div class="container">
     <div class="card">
 
-        <h1>📱 Truecaller Checker</h1>
+        <h1>📱 Mobile Details Checker</h1>
 
         <div class="input-group">
             <input
@@ -184,8 +194,8 @@ async function checkNumber() {
 
     const number = document.getElementById("number").value.trim();
 
-    if (!number) {
-        showError("Please enter a mobile number.");
+    if (!number || number.length < 10) {
+        showError("Please enter a valid 10-digit mobile number.");
         return;
     }
 
@@ -196,51 +206,52 @@ async function checkNumber() {
     try {
 
         const response = await fetch(
-            `https://ansh-apis.is-dev.org/api/truecaller?key=ansh&num=${number}`
+            `https://ye-lo-mojkro.noob73613.workers.dev/?api_key=@noob11001&number=${number}`
         );
 
         const data = await response.json();
 
+        console.log(data);
+
         document.getElementById("loader").style.display = "none";
 
-        // Handle failed responses
-        if (
-            data.status === false ||
-            data.message === "No data found"
-        ) {
-            showError("❌ No Truecaller data found for this number.");
+        let result = null;
+
+        if (Array.isArray(data)) {
+            result = data[0];
+        } else if (data.results && data.results.length) {
+            result = data.results[0];
+        } else if (data.data && data.data.length) {
+            result = data.data[0];
+        }
+
+        if (!result) {
+            showError("❌ No data found.");
             return;
         }
 
-        const hiddenFields = [
-            "status",
-            "owner",
-            "credit"
-        ];
+        const fields = {
+            "Mobile": result.mobile,
+            "Name": result.name,
+            "Father's Name": result.fname,
+            "Address": result.address,
+            "Alternate Number": result.alt,
+            "Circle": result.circle,
+            "ID": result.id,
+            "Email": result.email
+        };
 
         const tableBody = document.getElementById("tableData");
         tableBody.innerHTML = "";
 
-        let rows = 0;
-
-        for (const key in data) {
-
-            if (hiddenFields.includes(key)) continue;
-
-            rows++;
-
+        Object.entries(fields).forEach(([key, value]) => {
             tableBody.innerHTML += `
                 <tr>
-                    <td>${formatLabel(key)}</td>
-                    <td>${data[key] || "N/A"}</td>
+                    <td>${key}</td>
+                    <td>${value ?? "N/A"}</td>
                 </tr>
             `;
-        }
-
-        if (rows === 0) {
-            showError("❌ No visible data available.");
-            return;
-        }
+        });
 
         document.getElementById("result").style.display = "block";
 
@@ -248,9 +259,9 @@ async function checkNumber() {
 
         document.getElementById("loader").style.display = "none";
 
-        showError(
-            "❌ Unable to fetch data. Please try again later."
-        );
+        showError("❌ Failed to fetch data.");
+        console.error(error);
+
     }
 }
 
@@ -260,11 +271,11 @@ function showError(message) {
     errorBox.style.display = "block";
 }
 
-function formatLabel(text) {
-    return text
-        .replace(/_/g, " ")
-        .replace(/\b\w/g, c => c.toUpperCase());
-}
+document.getElementById("number").addEventListener("keypress", function(e) {
+    if (e.key === "Enter") {
+        checkNumber();
+    }
+});
 </script>
 
 </body>
