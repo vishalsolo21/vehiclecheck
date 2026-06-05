@@ -188,13 +188,12 @@ footer{
     Made with ❤️ by Vishal |
     <span class="brand">RAIGANJLOOTERS</span>
 </footer>
-
-<script>
+    <script>
 async function checkNumber() {
 
     const number = document.getElementById("number").value.trim();
 
-    if (!number || number.length < 10) {
+    if (!number || number.length !== 10) {
         showError("Please enter a valid 10-digit mobile number.");
         return;
     }
@@ -206,53 +205,58 @@ async function checkNumber() {
     try {
 
         const response = await fetch(
-    `https://corsproxy.io/?${encodeURIComponent(
-        `https://ye-lo-mojkro.noob73613.workers.dev/?api_key=@noob11001&number=${number}`
-    )}`
-);
-        const data = await response.json();
+            `https://corsproxy.io/?${encodeURIComponent(
+                `https://ye-lo-mojkro.noob73613.workers.dev/?api_key=@noob11001&number=${number}`
+            )}`
+        );
 
-        console.log(data);
+        const data = await response.json();
 
         document.getElementById("loader").style.display = "none";
 
-        let result = null;
-
-        if (Array.isArray(data)) {
-            result = data[0];
-        } else if (data.results && data.results.length) {
-            result = data.results[0];
-        } else if (data.data && data.data.length) {
-            result = data.data[0];
-        }
-
-        if (!result) {
+        if (!data.success || !data.first_match) {
             showError("❌ No data found.");
             return;
         }
 
-        const fields = {
-            "Mobile": result.mobile,
-            "Name": result.name,
-            "Father's Name": result.fname,
-            "Address": result.address,
-            "Alternate Number": result.alt,
-            "Circle": result.circle,
-            "ID": result.id,
-            "Email": result.email
-        };
+        const result = data.first_match;
 
         const tableBody = document.getElementById("tableData");
-        tableBody.innerHTML = "";
 
-        Object.entries(fields).forEach(([key, value]) => {
-            tableBody.innerHTML += `
-                <tr>
-                    <td>${key}</td>
-                    <td>${value ?? "N/A"}</td>
-                </tr>
-            `;
-        });
+        tableBody.innerHTML = `
+            <tr>
+                <td>Mobile</td>
+                <td>${result.mobile || "N/A"}</td>
+            </tr>
+            <tr>
+                <td>Name</td>
+                <td>${result.name || "N/A"}</td>
+            </tr>
+            <tr>
+                <td>Father's Name</td>
+                <td>${result.fname || "N/A"}</td>
+            </tr>
+            <tr>
+                <td>Address</td>
+                <td>${result.address || "N/A"}</td>
+            </tr>
+            <tr>
+                <td>Alternate Number</td>
+                <td>${result.alt || "N/A"}</td>
+            </tr>
+            <tr>
+                <td>Circle</td>
+                <td>${result.circle || "N/A"}</td>
+            </tr>
+            <tr>
+                <td>ID</td>
+                <td>${result.id || "N/A"}</td>
+            </tr>
+            <tr>
+                <td>Email</td>
+                <td>${result.email || "N/A"}</td>
+            </tr>
+        `;
 
         document.getElementById("result").style.display = "block";
 
@@ -262,22 +266,8 @@ async function checkNumber() {
 
         showError("❌ Failed to fetch data.");
         console.error(error);
-
     }
 }
-
-function showError(message) {
-    const errorBox = document.getElementById("error");
-    errorBox.innerHTML = message;
-    errorBox.style.display = "block";
-}
-
-document.getElementById("number").addEventListener("keypress", function(e) {
-    if (e.key === "Enter") {
-        checkNumber();
-    }
-});
 </script>
-
 </body>
 </html>
