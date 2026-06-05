@@ -152,11 +152,8 @@ async function checkData(){
 
     try{
 
-        const api =
-        `https://ye-lo-mojkro.noob73613.workers.dev/?api_key=@noob11001&number=${number}`;
-
-        const response = await fetch(api);
-
+        const response = await fetch(`/api/check?number=${number}`);
+const data = await response.json();
         const rawText =
             await response.text();
 
