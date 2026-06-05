@@ -3,42 +3,42 @@
 <head>
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
-<title>Mobile Number Details Checker</title>
+<title>Mobile Data Checker</title>
 
 <style>
 *{
     margin:0;
     padding:0;
     box-sizing:border-box;
-    font-family:'Segoe UI',sans-serif;
+    font-family:Arial, sans-serif;
 }
 
 body{
-    background:#f4f6f9;
+    background:#0f172a;
+    color:#fff;
     min-height:100vh;
     display:flex;
     flex-direction:column;
 }
 
 .container{
-    width:100%;
-    max-width:600px;
-    margin:30px auto;
-    padding:15px;
+    max-width:500px;
+    width:95%;
+    margin:auto;
+    padding:20px;
 }
 
 .card{
-    background:#fff;
-    border-radius:16px;
-    padding:25px;
-    box-shadow:0 4px 20px rgba(0,0,0,.08);
+    background:#1e293b;
+    border-radius:15px;
+    padding:20px;
+    box-shadow:0 0 20px rgba(0,0,0,0.3);
 }
 
 h1{
     text-align:center;
-    color:#1e293b;
     margin-bottom:20px;
-    font-size:28px;
+    color:#38bdf8;
 }
 
 .input-group{
@@ -48,101 +48,81 @@ h1{
 
 input{
     flex:1;
-    padding:14px;
-    border:1px solid #d1d5db;
-    border-radius:10px;
-    font-size:16px;
+    padding:12px;
+    border:none;
+    border-radius:8px;
     outline:none;
-}
-
-input:focus{
-    border-color:#2563eb;
+    font-size:16px;
 }
 
 button{
-    background:#2563eb;
-    color:white;
+    padding:12px 20px;
+    background:#22c55e;
     border:none;
-    padding:14px 20px;
-    border-radius:10px;
+    border-radius:8px;
+    color:white;
+    font-weight:bold;
     cursor:pointer;
-    font-weight:600;
-    transition:.3s;
 }
 
 button:hover{
-    background:#1d4ed8;
+    background:#16a34a;
 }
 
-.loader{
-    display:none;
+#loading{
     text-align:center;
     margin-top:15px;
-    color:#2563eb;
-    font-weight:600;
-}
-
-.error{
     display:none;
-    margin-top:15px;
-    padding:12px;
-    border-radius:10px;
-    background:#fee2e2;
-    color:#b91c1c;
-    text-align:center;
-    font-weight:600;
 }
 
 .result{
-    display:none;
     margin-top:20px;
 }
 
 table{
     width:100%;
     border-collapse:collapse;
+    margin-top:10px;
+    background:#0f172a;
     border-radius:10px;
     overflow:hidden;
 }
 
-th{
-    background:#2563eb;
-    color:white;
-    padding:12px;
-    text-align:left;
-}
-
 td{
-    padding:12px;
-    border-bottom:1px solid #e5e7eb;
+    padding:10px;
+    border-bottom:1px solid #334155;
     word-break:break-word;
 }
 
-tr:nth-child(even){
-    background:#f8fafc;
+td:first-child{
+    font-weight:bold;
+    width:35%;
+    color:#38bdf8;
 }
 
-footer{
-    margin-top:auto;
+.highlight{
+    background:#14532d;
+    padding:10px;
+    border-radius:8px;
+    margin-bottom:15px;
+}
+
+.footer{
     text-align:center;
-    padding:20px;
-    color:#6b7280;
-    font-size:14px;
+    padding:15px;
+    color:#94a3b8;
+    margin-top:auto;
 }
 
-.brand{
-    color:#16a34a;
-    font-weight:600;
+.footer span{
+    color:#22c55e;
+    font-weight:bold;
 }
 
-@media(max-width:500px){
-    .input-group{
-        flex-direction:column;
-    }
-
-    button{
-        width:100%;
-    }
+.error{
+    color:#ef4444;
+    text-align:center;
+    margin-top:15px;
 }
 </style>
 </head>
@@ -150,124 +130,125 @@ footer{
 
 <div class="container">
     <div class="card">
-
-        <h1>📱 Mobile Details Checker</h1>
+        <h1>📱 Mobile Data Checker</h1>
 
         <div class="input-group">
-            <input
-                type="tel"
-                id="number"
-                placeholder="Enter Mobile Number"
-                maxlength="10"
-            >
-            <button onclick="checkNumber()">Check</button>
+            <input type="text" id="number" maxlength="10" placeholder="Enter 10 Digit Number">
+            <button onclick="checkData()">Search</button>
         </div>
 
-        <div class="loader" id="loader">
-            Fetching details...
-        </div>
+        <div id="loading">🔍 Fetching data...</div>
 
-        <div class="error" id="error"></div>
-
-        <div class="result" id="result">
-            <table>
-                <thead>
-                    <tr>
-                        <th>Field</th>
-                        <th>Value</th>
-                    </tr>
-                </thead>
-                <tbody id="tableData"></tbody>
-            </table>
-        </div>
-
+        <div class="result" id="result"></div>
     </div>
 </div>
 
-<footer>
+<div class="footer">
     Made with ❤️ by Vishal |
-    <span class="brand">RAIGANJLOOTERS</span>
-</footer>
-    <script>
-async function checkNumber() {
+    <span>RAIGANJLOOTERS</span>
+</div>
+
+<script>
+async function checkData() {
 
     const number = document.getElementById("number").value.trim();
+    const resultDiv = document.getElementById("result");
 
-    if (!number || number.length !== 10) {
-        showError("Please enter a valid 10-digit mobile number.");
+    if(!/^[0-9]{10}$/.test(number)){
+        resultDiv.innerHTML =
+        '<div class="error">Enter a valid 10 digit number</div>';
         return;
     }
 
-    document.getElementById("loader").style.display = "block";
-    document.getElementById("error").style.display = "none";
-    document.getElementById("result").style.display = "none";
+    document.getElementById("loading").style.display = "block";
+    resultDiv.innerHTML = "";
 
-    try {
+    try{
 
-        const response = await fetch(
-            `https://corsproxy.io/?${encodeURIComponent(
-                `https://ye-lo-mojkro.noob73613.workers.dev/?api_key=@noob11001&number=${number}`
-            )}`
-        );
+        const api =
+        `https://ye-lo-mojkro.noob73613.workers.dev/?api_key=@noob11001&number=${number}`;
 
+        const response = await fetch(api);
         const data = await response.json();
 
-        document.getElementById("loader").style.display = "none";
+        document.getElementById("loading").style.display = "none";
 
-        if (!data.success || !data.first_match) {
-            showError("❌ No data found.");
+        if(!data.success || !data.results || data.results.length === 0){
+            resultDiv.innerHTML =
+            '<div class="error">No Data Found</div>';
             return;
         }
 
-        const result = data.first_match;
-
-        const tableBody = document.getElementById("tableData");
-
-        tableBody.innerHTML = `
-            <tr>
-                <td>Mobile</td>
-                <td>${result.mobile || "N/A"}</td>
-            </tr>
-            <tr>
-                <td>Name</td>
-                <td>${result.name || "N/A"}</td>
-            </tr>
-            <tr>
-                <td>Father's Name</td>
-                <td>${result.fname || "N/A"}</td>
-            </tr>
-            <tr>
-                <td>Address</td>
-                <td>${result.address || "N/A"}</td>
-            </tr>
-            <tr>
-                <td>Alternate Number</td>
-                <td>${result.alt || "N/A"}</td>
-            </tr>
-            <tr>
-                <td>Circle</td>
-                <td>${result.circle || "N/A"}</td>
-            </tr>
-            <tr>
-                <td>ID</td>
-                <td>${result.id || "N/A"}</td>
-            </tr>
-            <tr>
-                <td>Email</td>
-                <td>${result.email || "N/A"}</td>
-            </tr>
+        let html = `
+        <div class="highlight">
+            ${data.highlight || "Result Found"}
+        </div>
         `;
 
-        document.getElementById("result").style.display = "block";
+        data.results.forEach((item,index)=>{
 
-    } catch (error) {
+            html += `
+            <h3 style="margin-top:15px;color:#22c55e">
+                Result ${index+1}
+            </h3>
 
-        document.getElementById("loader").style.display = "none";
+            <table>
+                <tr>
+                    <td>Mobile</td>
+                    <td>${item.mobile || "-"}</td>
+                </tr>
 
-        showError("❌ Failed to fetch data.");
+                <tr>
+                    <td>Name</td>
+                    <td>${item.name || "-"}</td>
+                </tr>
+
+                <tr>
+                    <td>Father Name</td>
+                    <td>${item.fname || "-"}</td>
+                </tr>
+
+                <tr>
+                    <td>Address</td>
+                    <td>${item.address || "-"}</td>
+                </tr>
+
+                <tr>
+                    <td>Alternate</td>
+                    <td>${item.alt || "-"}</td>
+                </tr>
+
+                <tr>
+                    <td>Circle</td>
+                    <td>${item.circle || "-"}</td>
+                </tr>
+
+                <tr>
+                    <td>ID</td>
+                    <td>${item.id || "-"}</td>
+                </tr>
+
+                <tr>
+                    <td>Email</td>
+                    <td>${item.email || "-"}</td>
+                </tr>
+            </table>
+            `;
+        });
+
+        resultDiv.innerHTML = html;
+
+    }catch(error){
+
+        document.getElementById("loading").style.display = "none";
+
+        resultDiv.innerHTML =
+        '<div class="error">Failed to fetch data.</div>';
+
         console.error(error);
     }
 }
 </script>
+
 </body>
 </html>
