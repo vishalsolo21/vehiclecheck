@@ -1,3 +1,4 @@
+```html
 <!DOCTYPE html>
 <html lang="en">
 <head>
@@ -10,7 +11,7 @@
     margin:0;
     padding:0;
     box-sizing:border-box;
-    font-family:Arial, sans-serif;
+    font-family:Arial,sans-serif;
 }
 
 body{
@@ -22,23 +23,22 @@ body{
 }
 
 .container{
-    max-width:500px;
     width:95%;
-    margin:auto;
-    padding:20px;
+    max-width:600px;
+    margin:20px auto;
 }
 
 .card{
     background:#1e293b;
-    border-radius:15px;
     padding:20px;
-    box-shadow:0 0 20px rgba(0,0,0,0.3);
+    border-radius:15px;
+    box-shadow:0 0 20px rgba(0,0,0,.3);
 }
 
 h1{
     text-align:center;
-    margin-bottom:20px;
     color:#38bdf8;
+    margin-bottom:20px;
 }
 
 .input-group{
@@ -57,12 +57,12 @@ input{
 
 button{
     padding:12px 20px;
-    background:#22c55e;
     border:none;
     border-radius:8px;
-    color:white;
-    font-weight:bold;
+    background:#22c55e;
+    color:#fff;
     cursor:pointer;
+    font-weight:bold;
 }
 
 button:hover{
@@ -70,59 +70,36 @@ button:hover{
 }
 
 #loading{
-    text-align:center;
     margin-top:15px;
+    text-align:center;
     display:none;
 }
 
-.result{
+#result{
     margin-top:20px;
 }
 
-table{
-    width:100%;
-    border-collapse:collapse;
-    margin-top:10px;
-    background:#0f172a;
+pre{
+    background:#111827;
+    color:#22c55e;
+    padding:15px;
     border-radius:10px;
-    overflow:hidden;
-}
-
-td{
-    padding:10px;
-    border-bottom:1px solid #334155;
+    overflow:auto;
+    white-space:pre-wrap;
     word-break:break-word;
-}
-
-td:first-child{
-    font-weight:bold;
-    width:35%;
-    color:#38bdf8;
-}
-
-.highlight{
-    background:#14532d;
-    padding:10px;
-    border-radius:8px;
-    margin-bottom:15px;
+    font-size:13px;
 }
 
 .footer{
+    margin-top:auto;
     text-align:center;
     padding:15px;
     color:#94a3b8;
-    margin-top:auto;
 }
 
 .footer span{
     color:#22c55e;
     font-weight:bold;
-}
-
-.error{
-    color:#ef4444;
-    text-align:center;
-    margin-top:15px;
 }
 </style>
 </head>
@@ -130,16 +107,22 @@ td:first-child{
 
 <div class="container">
     <div class="card">
+
         <h1>📱 Mobile Data Checker</h1>
 
         <div class="input-group">
-            <input type="text" id="number" maxlength="10" placeholder="Enter 10 Digit Number">
+            <input
+                type="text"
+                id="number"
+                maxlength="10"
+                placeholder="Enter 10 Digit Number">
             <button onclick="checkData()">Search</button>
         </div>
 
-        <div id="loading">🔍 Fetching data...</div>
+        <div id="loading">Fetching data...</div>
 
-        <div class="result" id="result"></div>
+        <div id="result"></div>
+
     </div>
 </div>
 
@@ -149,19 +132,24 @@ td:first-child{
 </div>
 
 <script>
-async function checkData() {
+async function checkData(){
 
-    const number = document.getElementById("number").value.trim();
-    const resultDiv = document.getElementById("result");
+    const number =
+        document.getElementById("number").value.trim();
+
+    const result =
+        document.getElementById("result");
 
     if(!/^[0-9]{10}$/.test(number)){
-        resultDiv.innerHTML =
-        '<div class="error">Enter a valid 10 digit number</div>';
+        result.innerHTML =
+            "<pre>Please enter a valid 10 digit number.</pre>";
         return;
     }
 
-    document.getElementById("loading").style.display = "block";
-    resultDiv.innerHTML = "";
+    document.getElementById("loading").style.display =
+        "block";
+
+    result.innerHTML = "";
 
     try{
 
@@ -169,101 +157,38 @@ async function checkData() {
         `https://ye-lo-mojkro.noob73613.workers.dev/?api_key=@noob11001&number=${number}`;
 
         const response = await fetch(
-    "https://corsproxy.io/?" + encodeURIComponent(api)
-);
+            "https://corsproxy.io/?" +
+            encodeURIComponent(api)
+        );
 
-const text = await response.text();
+        const rawText =
+            await response.text();
 
-console.log("API Response:", text);
+        document.getElementById("loading").style.display =
+            "none";
 
-const data = JSON.parse(text);
+        result.innerHTML =
+            `<pre>${escapeHtml(rawText)}</pre>`;
 
-console.log(data);
-
-if (
-    !data ||
-    !Array.isArray(data.results) ||
-    data.results.length === 0
-) {
-    resultDiv.innerHTML =
-        '<div class="error">No Data Found</div>';
-    return;
-}{
-            resultDiv.innerHTML =
-            '<div class="error">No Data Found</div>';
-            return;
-        }
-
-        let html = `
-        <div class="highlight">
-            ${data.highlight || "Result Found"}
-        </div>
-        `;
-
-        data.results.forEach((item,index)=>{
-
-            html += `
-            <h3 style="margin-top:15px;color:#22c55e">
-                Result ${index+1}
-            </h3>
-
-            <table>
-                <tr>
-                    <td>Mobile</td>
-                    <td>${item.mobile || "-"}</td>
-                </tr>
-
-                <tr>
-                    <td>Name</td>
-                    <td>${item.name || "-"}</td>
-                </tr>
-
-                <tr>
-                    <td>Father Name</td>
-                    <td>${item.fname || "-"}</td>
-                </tr>
-
-                <tr>
-                    <td>Address</td>
-                    <td>${item.address || "-"}</td>
-                </tr>
-
-                <tr>
-                    <td>Alternate</td>
-                    <td>${item.alt || "-"}</td>
-                </tr>
-
-                <tr>
-                    <td>Circle</td>
-                    <td>${item.circle || "-"}</td>
-                </tr>
-
-                <tr>
-                    <td>ID</td>
-                    <td>${item.id || "-"}</td>
-                </tr>
-
-                <tr>
-                    <td>Email</td>
-                    <td>${item.email || "-"}</td>
-                </tr>
-            </table>
-            `;
-        });
-
-        resultDiv.innerHTML = html;
-
-    }catch(error){
-
-        document.getElementById("loading").style.display = "none";
-
-        resultDiv.innerHTML =
-        '<div class="error">Failed to fetch data.</div>';
-
-        console.error(error);
     }
+    catch(error){
+
+        document.getElementById("loading").style.display =
+            "none";
+
+        result.innerHTML =
+            `<pre>Error:\n${escapeHtml(error.toString())}</pre>`;
+    }
+}
+
+function escapeHtml(text){
+    return text
+        .replace(/&/g,"&amp;")
+        .replace(/</g,"&lt;")
+        .replace(/>/g,"&gt;");
 }
 </script>
 
 </body>
 </html>
+```
