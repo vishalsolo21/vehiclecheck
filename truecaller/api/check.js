@@ -1,27 +1,24 @@
 export default async function handler(req, res) {
-  const { number } = req.query;
-
-  if (!number) {
-    return res.status(400).json({
-      success: false,
-      message: "Number is required"
-    });
-  }
-
   try {
-    const response = await fetch(
-      `https://ye-lo-mojkro.noob73613.workers.dev/?api_key=@noob11001&number=${number}`
-    );
 
-    const data = await response.json();
+    const number = req.query.number;
 
-    res.setHeader("Access-Control-Allow-Origin", "*");
-    return res.status(200).json(data);
+    const api =
+      `https://ye-lo-mojkro.noob73613.workers.dev/?api_key=@noob11001&number=${number}`;
 
-  } catch (error) {
+    const response = await fetch(api);
+
+    const text = await response.text();
+
+    res.setHeader("Content-Type", "application/json");
+
+    return res.status(200).send(text);
+
+  } catch (err) {
+
     return res.status(500).json({
-      success: false,
-      message: error.message
+      error: err.message
     });
+
   }
 }
